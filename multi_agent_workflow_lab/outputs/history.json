@@ -1,0 +1,56 @@
+[
+  {
+    "step": 1,
+    "node": "start",
+    "status": "created",
+    "message": "实现一个 add(a, b) 函数，返回两个数字之和。"
+  },
+  {
+    "step": 2,
+    "node": "planner",
+    "status": "planning",
+    "message": "形成四步执行计划"
+  },
+  {
+    "step": 3,
+    "node": "programmer",
+    "status": "coding",
+    "message": "生成第 1 版代码"
+  },
+  {
+    "step": 4,
+    "node": "reviewer",
+    "status": "reviewing",
+    "message": "当前代码使用了减法，不符合 add 函数需求。"
+  },
+  {
+    "step": 5,
+    "node": "router",
+    "status": "reviewing",
+    "message": "审查未通过，返回 Programmer"
+  },
+  {
+    "step": 6,
+    "node": "programmer",
+    "status": "coding",
+    "message": "生成第 2 版代码"
+  },
+  {
+    "step": 7,
+    "node": "reviewer",
+    "status": "reviewing",
+    "message": "代码逻辑符合加法需求。"
+  },
+  {
+    "step": 8,
+    "node": "tester",
+    "status": "testing",
+    "message": "测试通过"
+  },
+  {
+    "step": 9,
+    "node": "checkpoint",
+    "status": "done",
+    "message": "检查点自动批准，工作流结束"
+  }
+]
