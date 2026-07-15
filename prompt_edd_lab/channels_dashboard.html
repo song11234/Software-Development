@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenClaw Gateway — 通道状态仪表盘</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --border: #334155;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --green: #22c55e;
+    --green-bg: #052e16;
+    --red: #ef4444;
+    --red-bg: #450a0a;
+    --yellow: #eab308;
+    --yellow-bg: #422006;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'PingFang SC', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px 24px;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 24px;
+    margin-bottom: 4px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .subtitle { color: var(--text-muted); margin-bottom: 28px; font-size: 14px; }
+  .grid { display: grid; gap: 20px; }
+
+  .row-2 { grid-template-columns: 1fr 1fr; }
+  .row-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .row-1 { grid-template-columns: 1fr; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 600;
+  }
+  .badge-ok { background: var(--green-bg); color: var(--green); }
+  .badge-err { background: var(--red-bg); color: var(--red); }
+  .badge-warn { background: var(--yellow-bg); color: var(--yellow); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .dot-red { background: var(--red); box-shadow: 0 0 6px var(--red); }
+  .dot-yellow { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+
+  .metric { margin-bottom: 12px; }
+  .metric-label { font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
+  .metric-value { font-size: 18px; font-weight: 700; }
+  .metric-sub { font-size: 11px; color: var(--text-muted); }
+
+  .progress-bar {
+    height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;
+    margin-top: 6px;
+  }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+  .progress-green { background: var(--green); }
+  .progress-yellow { background: var(--yellow); }
+  .progress-red { background: var(--red); }
+
+  .account-card {
+    border-left: 3px solid var(--border);
+    padding-left: 14px;
+    margin-bottom: 14px;
+  }
+  .account-card.active { border-left-color: var(--green); }
+  .account-card.inactive { border-left-color: var(--yellow); }
+  .account-name {
+    font-weight: 600; font-size: 15px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .account-props {
+    margin-top: 6px; font-size: 13px; color: var(--text-muted);
+    display: flex; flex-wrap: wrap; gap: 12px;
+  }
+  .account-props span { display: flex; align-items: center; gap: 4px; }
+
+  .err-msg {
+    margin-top: 8px; font-size: 12px; color: var(--red);
+    background: var(--red-bg); padding: 6px 10px; border-radius: 6px;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--text-muted); font-weight: 500; font-size: 11px; text-transform: uppercase; }
+  td .ok { color: var(--green); } td .nok { color: var(--red); } td .warn { color: var(--yellow); }
+
+  .timeline-bar {
+    height: 4px; background: var(--border); border-radius: 2px;
+    margin-top: 4px; position: relative;
+  }
+  .timeline-fill {
+    height: 100%; border-radius: 2px;
+    position: absolute; left: 0; top: 0;
+  }
+
+  .flow {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 16px; flex-wrap: wrap;
+  }
+  .flow-node {
+    padding: 8px 14px; border-radius: var(--radius);
+    border: 1px solid var(--border); font-size: 13px;
+    background: var(--card); white-space: nowrap;
+  }
+  .flow-arrow { color: var(--text-muted); font-size: 18px; }
+  .flow-node.src { border-color: var(--purple); }
+  .flow-node.dst { border-color: var(--green); }
+  .flow-node.off { border-color: var(--yellow); opacity: 0.5; }
+</style>
+</head>
+<body>
+
+<h1>
+  🔗 OpenClaw Gateway
+  <span class="badge badge-ok"><span class="dot dot-green"></span> RUNNING</span>
+</h1>
+<p class="subtitle">通道状态 · 2026-07-14 · 飞书 (Feishu/Lark)</p>
+
+<div class="grid row-3" style="margin-bottom:20px">
+  <!-- CPU / 事件循环 -->
+  <div class="card">
+    <div class="card-header">⚙️ 事件循环
+      <span class="badge badge-warn"><span class="dot dot-yellow"></span> DEGRADED</span>
+    </div>
+    <div class="metric">
+      <div class="metric-label">CPU 利用率</div>
+      <div class="metric-value">13.7%</div>
+      <div class="progress-bar"><div class="progress-fill progress-green" style="width:13.7%"></div></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">事件循环间隔</div>
+      <div class="metric-value">48.2 ms</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">延迟 P99</div>
+      <div class="metric-value">57.9 μs</div>
+      <div class="metric-sub">最大: 1672.5 μs</div>
+    </div>
+    <div class="err-msg">⚠️ 降级原因: event_loop_delay</div>
+  </div>
+
+  <!-- 账号概览 -->
+  <div class="card">
+    <div class="card-header">👤 飞书账号</div>
+    <table>
+      <tr><th>账号</th><th>状态</th><th>配置</th></tr>
+      <tr><td>default</td><td><span class="nok">● 未运行</span></td><td><span class="nok">✗</span></td></tr>
+      <tr><td>OC-DeepSeek-2410331105</td><td><span class="ok">● 运行中</span></td><td><span class="ok">✓</span></td></tr>
+      <tr><td>OC-Qwen-2410331105</td><td><span class="ok">● 运行中</span></td><td><span class="ok">✓</span></td></tr>
+    </table>
+  </div>
+
+  <!-- 速览 -->
+  <div class="card">
+    <div class="card-header">📊 速览</div>
+    <div class="metric">
+      <div class="metric-label">通道总数</div>
+      <div class="metric-value">1</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">活跃账号</div>
+      <div class="metric-value" style="color:var(--green)">2 / 3</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">待配置</div>
+      <div class="metric-value" style="color:var(--yellow)">1</div>
+    </div>
+  </div>
+</div>
+
+<!-- 飞书通道详情 -->
+<div class="card" style="margin-bottom:20px">
+  <div class="card-header">
+    🏢 飞书通道
+    <span class="badge badge-ok">configured</span>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px">
+    <!-- default -->
+    <div class="account-card inactive">
+      <div class="account-name">
+        <span class="dot dot-yellow"></span> default
+        <span class="badge badge-warn" style="font-size:10px">未配置</span>
+      </div>
+      <div class="account-props">
+        <span>Port: —</span><span>Domain: feishu</span>
+      </div>
+      <div class="err-msg">not configured</div>
+    </div>
+
+    <!-- oc-deepseek -->
+    <div class="account-card active">
+      <div class="account-name">
+        <span class="dot dot-green"></span> OC-DeepSeek
+        <span class="badge badge-ok" style="font-size:10px">运行中</span>
+      </div>
+      <div class="account-props">
+        <span>App: cli_aadf64ad813adbc9</span>
+        <span>Domain: feishu</span>
+      </div>
+      <div class="metric" style="margin-top:8px">
+        <div class="metric-label">启动时间</div>
+        <div class="metric-value" style="font-size:14px">2026-07-14 19:13</div>
+      </div>
+    </div>
+
+    <!-- oc-qwen -->
+    <div class="account-card active">
+      <div class="account-name">
+        <span class="dot dot-green"></span> OC-Qwen
+        <span class="badge badge-ok" style="font-size:10px">运行中</span>
+      </div>
+      <div class="account-props">
+        <span>App: cli_aadf5d4ea8ba5bed</span>
+        <span>Domain: feishu</span>
+      </div>
+      <div class="metric" style="margin-top:8px">
+        <div class="metric-label">启动时间</div>
+        <div class="metric-value" style="font-size:14px">2026-07-14 19:13</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 消息路由流程 -->
+<div class="card">
+  <div class="card-header">🔀 消息路由拓扑</div>
+  <div class="flow">
+    <div class="flow-node src">飞书群消息</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">OpenClaw Gateway (feishu)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node dst">
+      @OC-DeepSeek-2410331105<br>
+      <small style="color:var(--text-muted)">→ exp4-deepseek</small>
+    </div>
+    <span class="flow-arrow">|</span>
+    <div class="flow-node dst">
+      @OC-Qwen-2410331105<br>
+      <small style="color:var(--text-muted)">→ exp4-qwen</small>
+    </div>
+    <span class="flow-arrow">|</span>
+    <div class="flow-node off">default (未配置)</div>
+  </div>
+  <div style="margin-top:14px; font-size:12px; color:var(--text-muted)">
+    Account Binding 路由模式：每个飞书机器人账号固定绑定一个 Agent
+  </div>
+</div>
+
+</body>
+</html>
