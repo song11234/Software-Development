@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能资料整理助手</title>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text2: #64748b;
+    --accent: #6366f1;
+    --accent-hover: #4f46e5;
+    --green: #10b981;
+    --red: #ef4444;
+    --tag-bg: #eef2ff;
+    --tag-text: #4338ca;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: var(--shadow);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .header .logo { font-size: 22px; }
+  .header h1 { font-size: 18px; font-weight: 600; }
+  .header .sub { font-size: 13px; color: var(--text2); margin-left: auto; }
+
+  /* Auth bar */
+  .auth-bar {
+    background: #f1f5f9;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .auth-bar label { font-size: 13px; color: var(--text2); white-space: nowrap; }
+  .auth-bar input {
+    flex: 1; max-width: 300px;
+    padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;
+    font-size: 13px; font-family: monospace;
+  }
+  .auth-bar input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
+  .auth-bar .status { font-size: 12px; padding: 4px 10px; border-radius: 12px; }
+  .auth-bar .status.ok { background: #d1fae5; color: #065f46; }
+  .auth-bar .status.err { background: #fee2e2; color: #991b1b; }
+
+  /* Main layout */
+  .main { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; padding: 20px 24px; max-width: 1400px; margin: 0 auto; }
+  @media (max-width: 900px) { .main { grid-template-columns: 1fr; } }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  .card h2 { font-size: 15px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .card h2 .icon { font-size: 18px; }
+
+  /* Form */
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: var(--text2); }
+  .form-group input, .form-group textarea {
+    width: 100%; padding: 9px 12px;
+    border: 1px solid var(--border); border-radius: 6px;
+    font-size: 13px; font-family: inherit;
+    transition: border-color .15s;
+  }
+  .form-group textarea { resize: vertical; min-height: 120px; }
+  .form-group input:focus, .form-group textarea:focus {
+    outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+  }
+  .btn {
+    padding: 9px 20px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-secondary { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: #e2e8f0; }
+  .btn-danger { background: #fef2f2; color: var(--red); border: 1px solid #fecaca; }
+  .btn-danger:hover { background: #fee2e2; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* Result area */
+  .result-box {
+    margin-top: 14px; padding: 14px; border-radius: var(--radius);
+    border: 1px solid var(--border); background: #f8fafc;
+    font-size: 13px; max-height: 400px; overflow: auto;
+  }
+  .result-box h3 { font-size: 14px; margin-bottom: 8px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  .tag {
+    background: var(--tag-bg); color: var(--tag-text);
+    padding: 2px 10px; border-radius: 12px; font-size: 12px;
+  }
+  .key-points { margin: 8px 0; padding-left: 18px; }
+  .key-points li { margin-bottom: 4px; font-size: 13px; }
+  .cost { font-size: 11px; color: var(--text2); margin-top: 8px; }
+
+  /* Doc list */
+  .doc-item {
+    padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px;
+    cursor: pointer; transition: all .15s;
+  }
+  .doc-item:hover { border-color: var(--accent); background: #f8faff; }
+  .doc-item .title { font-weight: 500; font-size: 14px; }
+  .doc-item .meta { font-size: 12px; color: var(--text2); margin-top: 4px; display: flex; gap: 12px; }
+
+  .ask-answer {
+    background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px;
+    padding: 12px; margin-top: 8px; font-size: 14px;
+  }
+  .sources { margin-top: 8px; font-size: 12px; color: var(--text2); }
+
+  .empty { text-align: center; color: var(--text2); padding: 30px; font-size: 14px; }
+
+  .spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid #e2e8f0; border-top-color: var(--accent);
+    border-radius: 50%; animation: spin .6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="logo">&#128214;</span>
+  <h1>智能资料整理助手</h1>
+  <span class="sub">AI-powered Document Organizer</span>
+</div>
+
+<div class="auth-bar">
+  <label>API Token:</label>
+  <input type="password" id="token" value="dev-local-token" placeholder="输入 API Token">
+  <span id="token-status" class="status">--</span>
+</div>
+
+<div class="main">
+
+  <!-- 左侧：录入资料 -->
+  <div class="card">
+    <h2><span class="icon">&#128229;</span> 录入资料</h2>
+    <div class="form-group">
+      <label>标题</label>
+      <input type="text" id="doc-title" placeholder="例如：Python 异步编程入门指南">
+    </div>
+    <div class="form-group">
+      <label>正文内容</label>
+      <textarea id="doc-content" placeholder="粘贴或输入待整理的资料内容..."></textarea>
+    </div>
+    <button class="btn btn-primary" id="btn-ingest" onclick="ingestDocument()">
+      &#129302; AI 整理
+    </button>
+    <div id="ingest-result"></div>
+  </div>
+
+  <!-- 右侧：资料库 + 问答 -->
+  <div style="display:flex;flex-direction:column;gap:20px;">
+
+    <!-- 资料列表 -->
+    <div class="card">
+      <h2><span class="icon">&#128451;</span> 资料库 <span id="doc-count" style="font-size:12px;color:var(--text2);font-weight:400;"></span></h2>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button class="btn btn-secondary" onclick="loadDocuments()">&#128260; 刷新</button>
+        <button class="btn btn-danger" onclick="clearData()" style="font-size:12px;">清空数据</button>
+      </div>
+      <div id="doc-list"><div class="empty">点击刷新加载资料库</div></div>
+    </div>
+
+    <!-- 智能问答 -->
+    <div class="card">
+      <h2><span class="icon">&#128172;</span> 知识问答 (RAG)</h2>
+      <div class="form-group">
+        <label>基于资料库提问</label>
+        <textarea id="question" style="min-height:60px;" placeholder="例如：Python 异步编程的核心机制是什么？"></textarea>
+      </div>
+      <button class="btn btn-primary" id="btn-ask" onclick="askQuestion()">&#128269; 检索回答</button>
+      <div id="ask-result"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:8000';
+
+function getToken() { return document.getElementById('token').value.trim(); }
+function authHeaders() {
+  const t = getToken();
+  return t ? { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+}
+
+// Health check
+async function checkHealth() {
+  try {
+    const r = await fetch(API + '/health');
+    const d = await r.json();
+    const s = document.getElementById('token-status');
+    if (r.ok && d.status === 'ok') { s.textContent = '已连接'; s.className = 'status ok'; }
+    else { s.textContent = '异常'; s.className = 'status err'; }
+  } catch { document.getElementById('token-status').textContent = '不可达'; document.getElementById('token-status').className = 'status err'; }
+}
+
+// Ingest document
+async function ingestDocument() {
+  const title = document.getElementById('doc-title').value.trim();
+  const content = document.getElementById('doc-content').value.trim();
+  const btn = document.getElementById('btn-ingest');
+  const resultDiv = document.getElementById('ingest-result');
+
+  if (!title || !content) { resultDiv.innerHTML = '<div class="result-box" style="color:var(--red)">请填写标题和正文内容（至少10字）</div>'; return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> AI 整理中...';
+  resultDiv.innerHTML = '';
+
+  try {
+    const r = await fetch(API + '/api/ingest', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ title, content }) });
+    const d = await r.json();
+
+    if (!r.ok) {
+      resultDiv.innerHTML = `<div class="result-box" style="color:var(--red)">${r.status}: ${d.detail || JSON.stringify(d)}</div>`;
+    } else {
+      resultDiv.innerHTML = `
+        <div class="result-box">
+          <h3>&#9989; ${d.title}</h3>
+          <div class="tags">${(d.tags||[]).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+          <p><strong>分类：</strong>${d.category}</p>
+          <p><strong>摘要：</strong>${d.summary}</p>
+          <p><strong>要点：</strong></p>
+          <ul class="key-points">${(d.key_points||[]).map(k => `<li>${k}</li>`).join('')}</ul>
+          <p class="cost">&#9881; Token: ${d.token_usage?.total_tokens||0} | ID: ${d.document_id}</p>
+        </div>`;
+      loadDocuments();
+    }
+  } catch(e) {
+    resultDiv.innerHTML = `<div class="result-box" style="color:var(--red)">网络错误: ${e.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '&#129302; AI 整理';
+  }
+}
+
+// Load documents
+async function loadDocuments() {
+  const listDiv = document.getElementById('doc-list');
+  try {
+    const r = await fetch(API + '/api/documents', { headers: authHeaders() });
+    if (r.status === 401) { listDiv.innerHTML = '<div class="empty" style="color:var(--red)">认证失败，请检查 Token</div>'; return; }
+    const d = await r.json();
+    document.getElementById('doc-count').textContent = `(${d.total} 篇)`;
+    if (!d.documents.length) { listDiv.innerHTML = '<div class="empty">暂无资料，请先录入</div>'; return; }
+    listDiv.innerHTML = d.documents.map(doc => `
+      <div class="doc-item" onclick="viewDocument('${doc.document_id}')">
+        <div class="title">${doc.title}</div>
+        <div class="meta">
+          <span>&#128204; ${doc.category}</span>
+          <span>&#128278; ${(doc.tags||[]).slice(0,3).join(', ')}</span>
+          <span>&#128197; ${new Date(doc.created_at).toLocaleDateString()}</span>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    listDiv.innerHTML = `<div class="empty" style="color:var(--red)">连接失败: ${e.message}</div>`;
+  }
+}
+
+async function viewDocument(id) {
+  try {
+    const r = await fetch(API + '/api/documents/' + id, { headers: authHeaders() });
+    const d = await r.json();
+    const doc = d.document;
+    document.getElementById('ingest-result').innerHTML = `
+      <div class="result-box">
+        <h3>&#128196; ${doc.title}</h3>
+        <div class="tags">${(doc.tags||[]).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <p><strong>分类：</strong>${doc.category}</p>
+        <p><strong>摘要：</strong>${doc.summary}</p>
+        <p><strong>要点：</strong></p>
+        <ul class="key-points">${(doc.key_points||[]).map(k => `<li>${k}</li>`).join('')}</ul>
+        <details style="margin-top:8px"><summary style="cursor:pointer;color:var(--accent)">查看原文</summary>
+          <p style="white-space:pre-wrap;margin-top:6px">${doc.content}</p>
+        </details>
+        <p class="cost">&#9881; Token: ${doc.token_usage?.total_tokens||0} | ID: ${doc.document_id}</p>
+      </div>`;
+  } catch(e) {}
+}
+
+// RAG Q&A
+async function askQuestion() {
+  const question = document.getElementById('question').value.trim();
+  const btn = document.getElementById('btn-ask');
+  const resultDiv = document.getElementById('ask-result');
+  if (!question) { resultDiv.innerHTML = '<div style="color:var(--red);font-size:13px;">请输入问题</div>'; return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> 检索中...';
+  resultDiv.innerHTML = '';
+
+  try {
+    const r = await fetch(API + '/api/ask', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ question }) });
+    const d = await r.json();
+    if (!r.ok) {
+      resultDiv.innerHTML = `<div style="color:var(--red);font-size:13px;">${r.status}: ${d.detail||''}</div>`;
+    } else {
+      resultDiv.innerHTML = `
+        <div class="ask-answer"><strong>&#128161; 回答：</strong><br>${d.answer}</div>
+        ${d.sources?.length ? `<div class="sources">&#128214; 来源：${d.sources.map(s => s.title).join('、')} (相关度: ${d.sources.map(s=>s.relevance_score).join(', ')})</div>` : ''}
+        <div class="cost">&#9881; Token: ${d.token_usage?.total_tokens||0}</div>`;
+    }
+  } catch(e) {
+    resultDiv.innerHTML = `<div style="color:var(--red);font-size:13px;">网络错误: ${e.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '&#128269; 检索回答';
+  }
+}
+
+async function clearData() {
+  if (!confirm('确认清空所有资料？此操作不可撤销。')) return;
+  try {
+    const r = await fetch(API + '/api/documents', { headers: authHeaders() });
+    const d = await r.json();
+    for (const doc of (d.documents||[])) {
+      await fetch(API + '/api/documents/' + doc.document_id, { method: 'DELETE', headers: authHeaders() });
+    }
+    loadDocuments();
+  } catch(e) {}
+}
+
+// Init
+checkHealth();
+setInterval(checkHealth, 30000);
+loadDocuments();
+</script>
+</body>
+</html>

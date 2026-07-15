@@ -1,0 +1,25 @@
+{
+  "document_id": "460fc535-a99",
+  "title": "Python 异步编程入门指南",
+  "content": "Python 中的异步编程主要基于 asyncio 库实现。通过 async/await 关键字可以定义协程函数。事件循环 (event loop) 是异步编程的核心，它负责调度和执行协程。asyncio.gather() 可以并发执行多个协程，提高 I/O 密集型任务的性能。常见的异步场景包括网络请求、文件读写、数据库查询等。",
+  "category": "技术/编程",
+  "tags": [
+    "Python",
+    "异步编程",
+    "asyncio",
+    "并发"
+  ],
+  "summary": "本文介绍 Python 异步编程基础，涵盖 asyncio 库、async/await 语法和事件循环的用法。",
+  "key_points": [
+    "async/await 定义协程函数",
+    "事件循环负责调度协程",
+    "asyncio.gather 实现并发",
+    "适用于 I/O 密集型任务"
+  ],
+  "token_usage": {
+    "prompt_tokens": 100,
+    "completion_tokens": 50,
+    "total_tokens": 150
+  },
+  "created_at": "2026-07-15T08:46:27.519317+00:00"
+}
