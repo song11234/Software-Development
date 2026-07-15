@@ -1,0 +1,89 @@
+{
+  "captured_at": "2026-07-13T20:09:38+08:00",
+  "records": [
+    {
+      "code": "GENSHINGIFT",
+      "source_name": "天地游-原神兑换码合集",
+      "source_type": "third_party",
+      "source_url": "https://www.tiandiyou.com/youxigonglue/6041.html",
+      "published_at": "unknown",
+      "valid_from": "unknown",
+      "valid_until": "unknown",
+      "status": "unverified",
+      "confidence": "low",
+      "captured_at": "2026-07-13T20:09:38+08:00",
+      "evidence_text": "永久兑换码无需担心过期问题：GENSHINGIFT提供50原石和3个大英雄经验。来源为第三方网站，需与原神官方渠道核验。"
+    },
+    {
+      "code": "KT6AX6JQS5UW",
+      "source_name": "天地游-原神兑换码合集",
+      "source_type": "third_party",
+      "source_url": "https://www.tiandiyou.com/youxigonglue/6041.html",
+      "published_at": "unknown",
+      "valid_from": "unknown",
+      "valid_until": "unknown",
+      "status": "unverified",
+      "confidence": "low",
+      "captured_at": "2026-07-13T20:09:38+08:00",
+      "evidence_text": "KT6AX6JQS5UW输入后能获得100原石奖励。来源为第三方网站，需与原神官方渠道核验。"
+    },
+    {
+      "code": "BILIGIFT2025",
+      "source_name": "天地游-原神兑换码合集",
+      "source_type": "third_party",
+      "source_url": "https://www.tiandiyou.com/youxigonglue/6041.html",
+      "published_at": "unknown",
+      "valid_from": "unknown",
+      "valid_until": "unknown",
+      "status": "unverified",
+      "confidence": "low",
+      "captured_at": "2026-07-13T20:09:38+08:00",
+      "evidence_text": "BILIGIFT2025为B站用户专属福利，兑换后可获得限定风之翼皮肤。来源为第三方网站，需与B站官方活动页核验。"
+    },
+    {
+      "code": "CY2H2XHYZKCS",
+      "source_name": "天地游-原神兑换码合集",
+      "source_type": "third_party",
+      "source_url": "https://www.tiandiyou.com/youxigonglue/6041.html",
+      "published_at": "unknown",
+      "valid_from": "unknown",
+      "valid_until": "unknown",
+      "status": "unverified",
+      "confidence": "low",
+      "captured_at": "2026-07-13T20:09:38+08:00",
+      "evidence_text": "CY2H2XHYZKCS需通过特定合作平台获取，包含原石和摩拉奖励。来源为第三方网站，需与对应合作平台核验。"
+    },
+    {
+      "code": "向至冬20260812",
+      "source_name": "B站-原神兑换码专栏",
+      "source_type": "official_social",
+      "source_url": "https://www.bilibili.com/read/cv48145110",
+      "published_at": "2026-04-23T20:22:32+08:00",
+      "valid_from": "unknown",
+      "valid_until": "2026-08-12T23:59:00+08:00",
+      "status": "active_candidate",
+      "confidence": "high",
+      "captured_at": "2026-07-13T20:09:38+08:00",
+      "evidence_text": "B站专栏全文仅一个兑换码：向至冬20260812。码中日期20260812暗示有效截止日，发布者标注'原神兑换码'。来源为B站公开专栏（cv48145110），通过B站公开API获取。"
+    }
+  ],
+  "errors": [
+    {
+      "url": "https://www.bilibili.com/read/cv48145110",
+      "error": "页面为JS渲染SPA，urllib无法提取正文。正文通过B站公开API（/x/article/view?id=48145110）获取。"
+    },
+    {
+      "url": "https://t.bilibili.com/1044181535496863751",
+      "error": "B站动态需浏览器渲染，API返回-352风控校验失败。建议课堂中手动在浏览器打开查看。"
+    },
+    {
+      "url": "https://www.miyoushe.com/ys/article/71958768",
+      "error": "米游社为JS渲染SPA，urllib无法提取正文。"
+    },
+    {
+      "url": "https://www.tiandiyou.com/youxigonglue/6041.html",
+      "error": "页面正文可获取，但Python3 re.U默认模式下CJK字符被视为\\w，导致CODE_PATTERN的\\b边界在中英文交界处失效，regex未匹配到任何码。兑换码通过人工从页面meta description和正文提取。"
+    }
+  ],
+  "note": "所有候选码均需人工核验后方可作为有效兑换码使用。抓取过程中发现两个关键技术问题：(1) 现代SPA网站（B站/米游社）urllib无法获取正文；(2) Python re模块\\b在CJK+ASCII交界处不生效。"
+}
