@@ -1,0 +1,56 @@
+2026-07-13 15:36:20,219 - httpx - INFO - HTTP Request: GET http://127.0.0.1:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2026-07-13 15:36:20,345 - httpx - INFO - HTTP Request: HEAD http://127.0.0.1:7860/ "HTTP/1.1 200 OK"
+2026-07-13 15:36:22,191 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2026-07-13 15:40:04,195 - __main__ - INFO - 开始处理用户请求: 帮我查一下全公司的工资，算好扣税，然后给我个 CSV 文件, 模型: deepseek-chat
+2026-07-13 15:40:04,195 - __main__ - INFO - 初始化系统提示词
+2026-07-13 15:40:04,202 - __main__ - INFO - 开始迭代 1/10
+2026-07-13 15:40:04,204 - __main__ - INFO - 调用模型 deepseek-chat 进行推理
+2026-07-13 15:40:07,938 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-13 15:40:08,870 - __main__ - INFO - 模型请求调用 1 个工具
+2026-07-13 15:40:08,871 - __main__ - INFO - 准备调用工具: get_employee_directory
+2026-07-13 15:40:08,871 - __main__ - INFO - 工具参数: {}
+2026-07-13 15:40:08,877 - __main__ - INFO - 工具 get_employee_directory 执行完成，耗时: 0.00秒
+2026-07-13 15:40:08,877 - __main__ - INFO - 工具结果已回注到上下文
+2026-07-13 15:40:08,877 - __main__ - INFO - 继续下一轮迭代
+2026-07-13 15:40:08,879 - __main__ - INFO - 开始迭代 2/10
+2026-07-13 15:40:08,879 - __main__ - INFO - 调用模型 deepseek-chat 进行推理
+2026-07-13 15:40:08,995 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-13 15:40:10,157 - __main__ - INFO - 模型请求调用 1 个工具
+2026-07-13 15:40:10,157 - __main__ - INFO - 准备调用工具: calculate_payroll_and_tax
+2026-07-13 15:40:10,160 - __main__ - INFO - 工具参数: {'employees_json': '[{"id": "E01", "name": "张三", "level": "L1"}, {"id": "E02", "name": "李四", "level": "L2"}, {"id": "E03", "name": "王五", "level": "L3"}]'}
+2026-07-13 15:40:10,172 - __main__ - INFO - 工具 calculate_payroll_and_tax 执行完成，耗时: 0.00秒
+2026-07-13 15:40:10,174 - __main__ - INFO - 工具结果已回注到上下文
+2026-07-13 15:40:10,174 - __main__ - INFO - 继续下一轮迭代
+2026-07-13 15:40:10,174 - __main__ - INFO - 开始迭代 3/10
+2026-07-13 15:40:10,174 - __main__ - INFO - 调用模型 deepseek-chat 进行推理
+2026-07-13 15:40:10,308 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-13 15:40:12,307 - __main__ - INFO - 模型请求调用 1 个工具
+2026-07-13 15:40:12,308 - __main__ - INFO - 准备调用工具: export_payroll_csv
+2026-07-13 15:40:12,308 - __main__ - INFO - 工具参数: {'payroll_json': '[{"id": "E01", "name": "张三", "level": "L1", "应发工资": 10000, "五险一金扣除": 2000.0, "个税扣除": 400.0, "实发工资": 7600.0}, {"id": "E02", "name": "李四", "level": "L2", "应发工资": 20000, "五险一金扣除": 4000.0, "个税扣除": 800.0, "实发工资": 15200.0}, {"id": "E03", "name": "王五", "level": "L3", "应发工资": 35000, "五险一金扣除": 7000.0, "个税扣除": 1400.0, "实发工资": 26600.0}]'}
+2026-07-13 15:40:12,326 - __main__ - INFO - 工具 export_payroll_csv 执行完成，耗时: 0.00秒
+2026-07-13 15:40:12,327 - __main__ - INFO - 工具结果已回注到上下文
+2026-07-13 15:40:12,327 - __main__ - INFO - 继续下一轮迭代
+2026-07-13 15:40:12,327 - __main__ - INFO - 开始迭代 4/10
+2026-07-13 15:40:12,327 - __main__ - INFO - 调用模型 deepseek-chat 进行推理
+2026-07-13 15:40:12,551 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-13 15:40:15,270 - __main__ - INFO - 模型输出最终结果: 全部完成！以下是全公司的工资明细：
+
+## 📊 全公司工资明细表
+
+| 工号 | 姓名 | 职级 | 应发工资 | 五险一金扣除 | 个税扣除 | **实发工资** |
+|:---:|:---:|:-...
+2026-07-13 15:40:15,278 - __main__ - INFO - 用户请求处理完成，总迭代次数: 4
+2026-07-13 15:41:37,617 - __main__ - INFO - 开始处理用户请求: 我只想看李四的工资, 模型: deepseek-chat
+2026-07-13 15:41:37,625 - __main__ - INFO - 开始迭代 1/10
+2026-07-13 15:41:37,627 - __main__ - INFO - 调用模型 deepseek-chat 进行推理
+2026-07-13 15:41:40,406 - httpx - INFO - HTTP Request: POST https://api.deepseek.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-13 15:41:41,866 - __main__ - INFO - 模型输出最终结果: 没问题，以下是李四的工资明细：
+
+## 👤 李四 工资明细
+
+| 项目 | 金额 |
+|:---|:---:|
+| 工号 | E02 |
+| 职级 | L2 |
+| **应发工资** | **20,0...
+2026-07-13 15:41:41,885 - __main__ - INFO - 用户请求处理完成，总迭代次数: 1
